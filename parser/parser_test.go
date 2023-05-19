@@ -1475,6 +1475,58 @@ func TestParserConfigs(t *testing.T) {
 }
 `,
 	}, {
+		name: "SortRepeatedFieldsBySubfieldWithHeaderComment",
+		in: `# proto-file: path/to/my/file.proto
+# proto-message: my.package.MyMessage
+#
+# My comments here, also containing my textpbfmt options.
+foo: {
+  bar: EDIT
+}
+foo: {
+  bar: ADD
+}
+`,
+		config: Config{SortRepeatedFieldsBySubfield: []string{"bar"}},
+		out: `# proto-file: path/to/my/file.proto
+# proto-message: my.package.MyMessage
+#
+# My comments here, also containing my textpbfmt options.
+foo: {
+  bar: ADD
+}
+foo: {
+  bar: EDIT
+}
+`,
+	}, {
+		name: "SortRepeatedFieldsBySubfieldWithHeaderComment_EmptyLineDoesntHelp",
+		in: `# proto-file: path/to/my/file.proto
+# proto-message: my.package.MyMessage
+#
+# My comments here, also containing my textpbfmt options.
+
+foo: {
+  bar: EDIT
+}
+foo: {
+  bar: ADD
+}
+`,
+		config: Config{SortRepeatedFieldsBySubfield: []string{"bar"}},
+		out: `# proto-file: path/to/my/file.proto
+# proto-message: my.package.MyMessage
+#
+# My comments here, also containing my textpbfmt options.
+
+foo: {
+  bar: ADD
+}
+foo: {
+  bar: EDIT
+}
+`,
+	}, {
 		name: "SortNamedFieldByMultipleSubfieldContents",
 		in: `presubmit: {
   operation {
